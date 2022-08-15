@@ -34,3 +34,38 @@
 // const jsonText = JSON.stringify('Hi there! I use single quotes in raw JS'); // ""Hi there! ...""
 // const jsonArray = JSON.stringify([1, 2, 3]); // "[1,2,3]"
 // const jsonBoolean = JSON.stringify(true); // "true"
+
+const fetchBtn = document.getElementById('fetch');
+const xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://jsonplaceholder.typicode.com/posts');
+xhr.responseType = 'json';
+const postTemplate = document.getElementById('single-post');
+const postsDisp = document.querySelector('.posts');
+fetchBtn.addEventListener('click', () => {
+  const listOfPosts = xhr.response;
+  for (const post of listOfPosts) {
+    const postElement = document.importNode(postTemplate.content, true);
+    postElement.querySelector('h2').textContent = post.title.toUpperCase();
+    postElement.querySelector('p').textContent = post.body;
+    postsDisp.append(postElement);
+  }
+});
+xhr.send();
+
+// const fetchBtn = document.getElementById('fetch');
+// const xhr = new XMLHttpRequest();
+// xhr.open('GET', 'https://jsonplaceholder.typicode.com/posts');
+// xhr.responseType = 'json';
+// const postTemplate = document.getElementById('single-post');
+// const posts = document.querySelector('.posts');
+
+// fetchBtn.addEventListener('click', () => {
+//   const listOfPosts = xhr.response;
+//   for (const post of listOfPosts) {
+//     const postEl = document.importNode(postTemplate.content, true);
+//     postEl.querySelector('h2').textContent = post.title.toUpperCase();
+//     postEl.querySelector('p').textContent = post.body;
+//     posts.append(postEl);
+//   }
+// });
+// xhr.send();
