@@ -36,36 +36,32 @@
 // const jsonBoolean = JSON.stringify(true); // "true"
 
 const fetchBtn = document.getElementById('fetch');
-const xhr = new XMLHttpRequest();
-xhr.open('GET', 'https://jsonplaceholder.typicode.com/posts');
-xhr.responseType = 'json';
+
 const postTemplate = document.getElementById('single-post');
 const postsDisp = document.querySelector('.posts');
+
+function sendHttpRequest(method, url) {
+  const promise = new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.responseType = 'json';
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.send();
+  });
+  return promise;
+}
+
 fetchBtn.addEventListener('click', () => {
-  const listOfPosts = xhr.response;
-  for (const post of listOfPosts) {
-    const postElement = document.importNode(postTemplate.content, true);
-    postElement.querySelector('h2').textContent = post.title.toUpperCase();
-    postElement.querySelector('p').textContent = post.body;
-    postsDisp.append(postElement);
-  }
+  sendHttpRequest('GET', 'https://jsonplaceholder.typicode.com/posts').then(
+    (responseData) => {
+      for (const post of responseData) {
+        const postElement = document.importNode(postTemplate.content, true);
+        postElement.querySelector('h2').textContent = post.title.toUpperCase();
+        postElement.querySelector('p').textContent = post.body;
+        postsDisp.append(postElement);
+      }
+    }
+  );
 });
-xhr.send();
-
-// const fetchBtn = document.getElementById('fetch');
-// const xhr = new XMLHttpRequest();
-// xhr.open('GET', 'https://jsonplaceholder.typicode.com/posts');
-// xhr.responseType = 'json';
-// const postTemplate = document.getElementById('single-post');
-// const posts = document.querySelector('.posts');
-
-// fetchBtn.addEventListener('click', () => {
-//   const listOfPosts = xhr.response;
-//   for (const post of listOfPosts) {
-//     const postEl = document.importNode(postTemplate.content, true);
-//     postEl.querySelector('h2').textContent = post.title.toUpperCase();
-//     postEl.querySelector('p').textContent = post.body;
-//     posts.append(postEl);
-//   }
-// });
-// xhr.send();
