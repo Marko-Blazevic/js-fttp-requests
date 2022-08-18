@@ -35,12 +35,15 @@
 // const jsonArray = JSON.stringify([1, 2, 3]); // "[1,2,3]"
 // const jsonBoolean = JSON.stringify(true); // "true"
 
-const fetchBtn = document.getElementById('fetch');
-
 const postTemplate = document.getElementById('single-post');
 const postsDisp = document.querySelector('.posts');
+const newPost = document.getElementById('new-post');
+const inputTitle = newPost.querySelector('#title');
+const inputContent = newPost.querySelector('#content');
+const addBtn = newPost.querySelector('button');
+const fetchBtn = document.getElementById('fetch');
 
-function sendHttpRequest(method, url) {
+function sendHttpRequest(method, url, data) {
   const promise = new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
@@ -49,30 +52,48 @@ function sendHttpRequest(method, url) {
       resolve(xhr.response);
     };
 
-    xhr.send();
+    xhr.send(JSON.stringify(data));
   });
   return promise;
 }
 
-fetchBtn.addEventListener('click', async function () {
-  let responseData;
-  try {
-    responseData = await sendHttpRequest(
-      'GET',
-      'https://jsonplaceholder.typicode.com/posts'
-    );
-
-    console.log(responseData);
-    for (const post of responseData) {
-      const postElement = document.importNode(postTemplate.content, true);
-      postElement.querySelector('h2').textContent = post.title.toUpperCase();
-      postElement.querySelector('p').textContent = post.body;
-      postsDisp.append(postElement);
-    }
-  } catch (err) {
-    console.log(err);
+async function fetchPosts() {
+  const responseData = await sendHttpRequest(
+    'GET',
+    'https://jsonplaceholder.typicode.com/posts'
+  );
+  console.log(responseData);
+  for (const post of responseData) {
+    const postElement = document.importNode(postTemplate.content, true);
+    postElement.querySelector('h2').textContent = post.title.toUpperCase();
+    postElement.querySelector('p').textContent = post.body;
+    postsDisp.append(postElement);
   }
-});
+}
+
+async function createPost(event) {
+  event.preventDefault();
+  let userID = Math.random();
+  const postData = {
+    title: inputTitle.value,
+    body: inputContent.value,
+    userId: userID,
+  };
+
+  console.log(postData);
+
+  sendHttpRequest(
+    'POST',
+    'https://jsonplaceholder.typicode.com/posts',
+    postData
+  );
+}
+
+fetchBtn.addEventListener('click', fetchPosts);
+addBtn.addEventListener('click', createPost);
+
+// PROMISIFYING
+
 // fetchBtn.addEventListener('click', () => {
 //   sendHttpRequest('GET', 'https://jsonplaceholder.typicode.com/posts')
 //     .then((responseData) => {
