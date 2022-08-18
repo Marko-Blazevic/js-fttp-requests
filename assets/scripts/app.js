@@ -35,13 +35,15 @@
 // const jsonArray = JSON.stringify([1, 2, 3]); // "[1,2,3]"
 // const jsonBoolean = JSON.stringify(true); // "true"
 
-const postTemplate = document.getElementById('single-post');
+const singlePost = document.getElementById('single-post');
 const postsDisp = document.querySelector('.posts');
 const newPost = document.getElementById('new-post');
 const inputTitle = newPost.querySelector('#title');
 const inputContent = newPost.querySelector('#content');
 const addBtn = newPost.querySelector('button');
 const fetchBtn = document.getElementById('fetch');
+const form = document.querySelector('form');
+const ulItem = document.querySelector('ul');
 
 function sendHttpRequest(method, url, data) {
   const promise = new Promise((resolve, reject) => {
@@ -62,25 +64,24 @@ async function fetchPosts() {
     'GET',
     'https://jsonplaceholder.typicode.com/posts'
   );
-  console.log(responseData);
   for (const post of responseData) {
-    const postElement = document.importNode(postTemplate.content, true);
+    const postElement = document.importNode(singlePost.content, true);
     postElement.querySelector('h2').textContent = post.title.toUpperCase();
     postElement.querySelector('p').textContent = post.body;
+    postElement.querySelector('li').id = post.id;
     postsDisp.append(postElement);
   }
 }
 
-async function createPost(event) {
-  event.preventDefault();
+fetchBtn.addEventListener('click', fetchPosts);
+
+async function createPost() {
   let userID = Math.random();
   const postData = {
     title: inputTitle.value,
     body: inputContent.value,
     userId: userID,
   };
-
-  console.log(postData);
 
   sendHttpRequest(
     'POST',
@@ -89,8 +90,20 @@ async function createPost(event) {
   );
 }
 
-fetchBtn.addEventListener('click', fetchPosts);
-addBtn.addEventListener('click', createPost);
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  createPost();
+});
+
+async function deletePost(id) {
+  sendHttpRequest('DELETE', `https://jsonplaceholder.typicode.com/posts/${id}`);
+}
+
+ulItem.addEventListener('click', (event) => {
+  if (event.target.tagName === 'BUTTON') {
+    deletePost(event.target.closest('li').id);
+  }
+});
 
 // PROMISIFYING
 
@@ -98,7 +111,7 @@ addBtn.addEventListener('click', createPost);
 //   sendHttpRequest('GET', 'https://jsonplaceholder.typicode.com/posts')
 //     .then((responseData) => {
 //       for (const post of responseData) {
-//         const postElement = document.importNode(postTemplate.content, true);
+//         const postElement = document.importNode(singlePost.content, true);
 //         postElement.querySelector('h2').textContent = post.title.toUpperCase();
 //         postElement.querySelector('p').textContent = post.body;
 //         postsDisp.append(postElement);
