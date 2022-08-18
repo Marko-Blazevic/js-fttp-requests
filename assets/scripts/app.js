@@ -48,23 +48,42 @@ function sendHttpRequest(method, url) {
     xhr.onload = function () {
       resolve(xhr.response);
     };
-    reject('Fuck');
+
     xhr.send();
   });
   return promise;
 }
 
-fetchBtn.addEventListener('click', () => {
-  sendHttpRequest('GET', 's')
-    .then((responseData) => {
-      for (const post of responseData) {
-        const postElement = document.importNode(postTemplate.content, true);
-        postElement.querySelector('h2').textContent = post.title.toUpperCase();
-        postElement.querySelector('p').textContent = post.body;
-        postsDisp.append(postElement);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+fetchBtn.addEventListener('click', async function () {
+  let responseData;
+  try {
+    responseData = await sendHttpRequest(
+      'GET',
+      'https://jsonplaceholder.typicode.com/posts'
+    );
+
+    console.log(responseData);
+    for (const post of responseData) {
+      const postElement = document.importNode(postTemplate.content, true);
+      postElement.querySelector('h2').textContent = post.title.toUpperCase();
+      postElement.querySelector('p').textContent = post.body;
+      postsDisp.append(postElement);
+    }
+  } catch (err) {
+    console.log(err);
+  }
 });
+// fetchBtn.addEventListener('click', () => {
+//   sendHttpRequest('GET', 'https://jsonplaceholder.typicode.com/posts')
+//     .then((responseData) => {
+//       for (const post of responseData) {
+//         const postElement = document.importNode(postTemplate.content, true);
+//         postElement.querySelector('h2').textContent = post.title.toUpperCase();
+//         postElement.querySelector('p').textContent = post.body;
+//         postsDisp.append(postElement);
+//       }
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// });
